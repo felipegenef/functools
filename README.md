@@ -1,6 +1,6 @@
 # Functools - A Go Toolkit for Stream and Slice Operations
 ![Codecov](https://codecov.io/gh/felipegenef/functools/branch/main/graph/badge.svg)
-![Build Status](https://github.com/felipegenef/functools/actions/workflows/go.yml/badge.svg)
+![Test Status](https://img.shields.io/github/workflow/status/felipegenef/functools/coverage?label=Test%20Status&style=for-the-badge)
 
 
 **Functools** is a versatile toolkit for processing and manipulating streams and slices in Go. It provides powerful functions for creating, transforming, filtering, and consuming data streams and slices, enabling you to write clean, functional-style code with minimal boilerplate.
