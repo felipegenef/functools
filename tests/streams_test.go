@@ -42,24 +42,14 @@ func TestStreamPipe(t *testing.T) {
 	transformed := stream.Pipe(func(x int) any { return x * 2 })
 
 	// Collect the transformed stream into a slice (which will be of type []any)
-	result := transformed.ToSlice()
-
-	// Convert the result from []any to []int for comparison
-	var resultInts []int
-	for _, v := range result {
-		if v, ok := v.(int); ok {
-			resultInts = append(resultInts, v)
-		} else {
-			t.Errorf("Expected int, but got %T", v)
-		}
-	}
+	result := functools.RecastStream[int](transformed).ToSlice()
 
 	// Expected result
 	expected := []int{2, 4, 6, 8}
 
 	// Compare the result to the expected value
-	if !reflect.DeepEqual(resultInts, expected) {
-		t.Errorf("Expected %v, got %v", expected, resultInts)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 

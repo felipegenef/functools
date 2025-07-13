@@ -53,27 +53,17 @@ func TestBufferedStreamPipe(t *testing.T) {
 	buffered := functools.CreateBufferedStream(generator, 3)
 
 	// Apply Pipe to double each item (transforming int to int)
-	transformed := buffered.Pipe(func(x int) any { return x * 2 })
+	transformed := functools.RecastBufferedStream[int](buffered.Pipe(func(x int) any { return x * 2 }))
 
 	// Get the result (which is of type []any)
 	result := transformed.ToSlice()
-
-	// Convert the result to []int for easy comparison
-	var resultInts []int
-	for _, v := range result {
-		if v, ok := v.(int); ok {
-			resultInts = append(resultInts, v)
-		} else {
-			t.Errorf("Expected int, but got %T", v)
-		}
-	}
 
 	// Expected result
 	expected := []int{2, 4, 6, 8, 10}
 
 	// Compare the result to the expected value
-	if !reflect.DeepEqual(resultInts, expected) {
-		t.Errorf("Expected %v, got %v", expected, resultInts)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 
@@ -93,27 +83,17 @@ func TestBufferedStreamBufferSizeConsistency(t *testing.T) {
 	// By checking the number of items processed in one go
 	processedItems := 0
 
-	result := buffered.
+	result := functools.RecastBufferedStream[int](buffered.
 		Pipe(func(x int) any {
 			processedItems++
 			return x
-		}).
+		})).
 		// ToSlice will block until all items are processed
 		ToSlice()
 
-	// Type assertion to check if result is of type []int
-	var resultInts []int
-	for _, v := range result {
-		if v, ok := v.(int); ok {
-			resultInts = append(resultInts, v)
-		} else {
-			t.Errorf("Expected int, but got %T", v)
-		}
-	}
-
 	expected := []int{1, 2, 3, 4, 5}
-	if !reflect.DeepEqual(resultInts, expected) {
-		t.Errorf("Expected %v, got %v", expected, resultInts)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 
 	if processedItems != len(items) {
@@ -151,28 +131,18 @@ func TestBufferedStreamWithMultipleItemsAndSmallerBuffer(t *testing.T) {
 	// Test the number of items processed in batches (buffer size)
 	batches := 0
 	// Collect the buffered stream into a slice
-	result := buffered.
+	result := functools.RecastBufferedStream[int](buffered.
 		Pipe(func(x int) any {
 			// Each batch is processed in sequence, each element can come
 			// through one by one due to the buffer size
 			batches++
 			return x
-		}).
+		})).
 		ToSlice()
 	expected := []int{1, 2, 3, 4, 5}
 
-	// Type assertion to check if result is of type []int
-	var resultInts []int
-	for _, v := range result {
-		if v, ok := v.(int); ok {
-			resultInts = append(resultInts, v)
-		} else {
-			t.Errorf("Expected int, but got %T", v)
-		}
-	}
-
-	if !reflect.DeepEqual(resultInts, expected) {
-		t.Errorf("Expected %v, got %v", expected, resultInts)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 	if batches != len(items) {
 		t.Errorf("Expected %d items to be processed, but %d were processed", len(items), batches)

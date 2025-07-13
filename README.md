@@ -190,7 +190,116 @@ Sort(func(a, b any) bool {
 })
 
 ```
+### Type Recasting After Transformation
 
-## Additional Notes
+After using Map or Pipe, which typically convert elements to any, it's often necessary to recast the stream or slice back to its original or intended type. To support this, Functools now includes three helper functions:
 
+- RecastStream[T]
+- RecastBufferedStream[T]
+- RecastSlice[T]
+
+These functions allow you to safely cast elements of a stream or slice of any back to a specific type T, filtering out elements that cannot be cast.
+
+#### Why Use Recast?
+
+In Go, functions like Map and Pipe typically return values as any. This allows flexibility but requires type assertions for further type-specific operations like Sort, Reduce, or arithmetic. Recast* functions simplify this by casting the entire stream or slice in a single step, improving readability and safety.
+
+#### Example: Recasting a Buffered Stream
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/felipegenef/functools"
+)
+
+func main() {
+	items := []int{1, 2, 3, 4, 5}
+	bufferSize := 2
+
+	// Generator to produce values
+	generator := func(ch chan int) {
+		for _, v := range items {
+			ch <- v
+		}
+	}
+
+	// Create a buffered stream
+	stream := functools.CreateBufferedStream(generator, bufferSize)
+
+	// Transform using Pipe, then recast back to int
+	result := functools.RecastBufferedStream[int](
+		stream.Pipe(func(x int) any {
+			return x // just passing through, but could be any transformation
+		}),
+	).ToSlice()
+
+	fmt.Println(result) // Output: [1 2 3 4 5]
+}
+```
+
+#### Example: Recasting a Slice After Map
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/felipegenef/functools"
+)
+
+func main() {
+	items := []int{1, 2, 3}
+	result := functools.RecastSlice[int](
+		functools.Slicefy(items).
+			Map(func(i int) any { return i * 10 }),
+	).ToSlice()
+
+	fmt.Println(result) // Output: [10 20 30]
+}
+```
+
+#### Example: Recasting Stream
+
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/felipegenef/functools"
+)
+
+func main() {
+	items := []int{1, 2, 3, 4, 5}
+
+	// Generator to produce values
+	generator := func(ch chan int) {
+		for _, v := range items {
+			ch <- v
+		}
+	}
+
+	// Create a buffered stream
+	stream := functools.CreateStream(generator)
+
+	// Transform using Pipe, then recast back to int
+	result := functools.RecastStream[int](
+		stream.Pipe(func(x int) any {
+			return x // just passing through, but could be any transformation
+		}),
+	).ToSlice()
+
+	fmt.Println(result) // Output: [1 2 3 4 5]
+}
+
+```
+
+## ⚠️ Notes
+- Only elements that successfully cast to the target type are included in the result.
+- This helps avoid runtime panics when performing type-specific operations downstream.
+- Useful especially in generic pipelines where transformations produce any.
 - **Backpressure**: When using BufferedStream, backpressure occurs when the producer generates data faster than the consumer can process it

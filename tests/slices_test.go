@@ -35,8 +35,8 @@ func TestIterableMap(t *testing.T) {
 	iter := functools.Slicefy(items)
 
 	mapped := iter.Map(func(x int) any { return x * x })
-	result := mapped.ToSlice()
-	expected := []interface{}{1, 4, 9, 16}
+	result := functools.RecastSlice[int](mapped).ToSlice()
+	expected := []int{1, 4, 9, 16}
 
 	if !reflect.DeepEqual(result, expected) {
 		t.Errorf("Expected %v, got %v", expected, result)

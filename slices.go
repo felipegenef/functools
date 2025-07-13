@@ -31,12 +31,12 @@ func (c *iterable[InputType]) ForEach(fn func(InputType)) {
 }
 
 // Map applies the transformation function fn and returns a new iterable
-func (c *iterable[InputType]) Map(fn func(InputType) any) *iterable[interface{}] {
+func (c *iterable[InputType]) Map(fn func(InputType) any) *iterable[any] {
 	var result []any
 	for _, v := range c.items {
 		result = append(result, fn(v))
 	}
-	return &iterable[interface{}]{items: result}
+	return &iterable[any]{items: result}
 }
 
 // ToSlice returns the internal slice (for anyone to access directly)
@@ -129,4 +129,16 @@ func (c *iterable[InputType]) ToBufferedStream(bufferSize int) *bufferedStream[I
 		}
 	}()
 	return &bufferedStream[InputType]{stream: ch}
+}
+
+func RecastSlice[SliceType any](input *iterable[any]) *iterable[SliceType] {
+	var result []SliceType
+	for _, v := range input.items {
+		// Assuming the input can be directly converted to SliceType.
+		// You'll need to handle the conversion, potentially with type assertions.
+		if casted, ok := v.(SliceType); ok {
+			result = append(result, casted)
+		}
+	}
+	return &iterable[SliceType]{items: result}
 }

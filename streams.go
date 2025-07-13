@@ -80,3 +80,20 @@ func (s *streamable[InputType]) ToBufferedStream(bufferSize int) *bufferedStream
 	}()
 	return &bufferedStream[InputType]{stream: ch}
 }
+
+func RecastStream[StreamType any](s *streamable[any]) *streamable[StreamType] {
+	out := make(chan StreamType)
+	go func() {
+		defer close(out)
+		for v := range s.stream {
+			// Attempt to cast each item in the stream to OutputType
+			if casted, ok := v.(StreamType); ok {
+				out <- casted
+			} else {
+				// Handle the case where conversion fails (Optional)
+				// For now, we're just skipping items that can't be cast.
+			}
+		}
+	}()
+	return &streamable[StreamType]{stream: out}
+}
