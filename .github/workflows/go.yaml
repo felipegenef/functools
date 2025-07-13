@@ -24,10 +24,11 @@ jobs:
       - name: Install dependencies
         run: go mod tidy
 
-      - name: Run tests and coverage
+      - name: Run tests and generate coverage report
         run: |
           go test -coverprofile=coverage.out
 
-      - name: Upload coverage report
-        run: |
-          cat coverage.out
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          file: coverage.out

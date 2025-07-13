@@ -1,4 +1,3 @@
-# functools
+# Functools
 
-
-[![Coverage Status](https://img.shields.io/github/workflow/status/felipegenef/functools/Go%20Coverage)](https://github.com/felipegenef/functools/actions)
+[![codecov](https://codecov.io/gh/felipegenef/functools/branch/main/graph/badge.svg)](https://codecov.io/gh/felipegenef/functools)
