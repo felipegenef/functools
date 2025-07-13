@@ -89,9 +89,6 @@ func RecastBufferedStream[StreamType any](s *bufferedStream[any]) *bufferedStrea
 			// Attempt to cast each item in the stream to OutputType
 			if casted, ok := v.(StreamType); ok {
 				out <- casted
-			} else {
-				// Handle the case where conversion fails (Optional)
-				// For now, we're just skipping items that can't be cast.
 			}
 		}
 	}()
