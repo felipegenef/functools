@@ -53,7 +53,7 @@ func TestBufferedStreamPipe(t *testing.T) {
 	buffered := functools.CreateBufferedStream(generator, 3)
 
 	// Apply Pipe to double each item (transforming int to int)
-	transformed := buffered.Pipe(func(x int) int { return x * 2 })
+	transformed := buffered.Pipe(func(x int) any { return x * 2 })
 
 	// Get the result (which is of type []any)
 	result := transformed.ToSlice()
@@ -94,7 +94,7 @@ func TestBufferedStreamBufferSizeConsistency(t *testing.T) {
 	processedItems := 0
 
 	result := buffered.
-		Pipe(func(x int) int {
+		Pipe(func(x int) any {
 			processedItems++
 			return x
 		}).
@@ -152,7 +152,7 @@ func TestBufferedStreamWithMultipleItemsAndSmallerBuffer(t *testing.T) {
 	batches := 0
 	// Collect the buffered stream into a slice
 	result := buffered.
-		Pipe(func(x int) int {
+		Pipe(func(x int) any {
 			// Each batch is processed in sequence, each element can come
 			// through one by one due to the buffer size
 			batches++

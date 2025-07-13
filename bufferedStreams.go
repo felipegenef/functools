@@ -27,7 +27,7 @@ func CreateBufferedStream[InputType any](generator func(chan InputType), bufferS
 }
 
 // Pipe creates a new streamable by applying fn to each item
-func (s *bufferedStream[InputType]) Pipe(fn func(InputType) InputType) *bufferedStream[any] {
+func (s *bufferedStream[InputType]) Pipe(fn func(InputType) any) *bufferedStream[any] {
 	out := make(chan any)
 	go func() {
 		defer close(out)

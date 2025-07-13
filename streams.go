@@ -28,8 +28,8 @@ func CreateStream[InputType any](generator func(chan InputType)) *streamable[Inp
 	return &streamable[InputType]{stream: ch}
 }
 
-// Map creates a new streamable by applying fn to each item
-func (s *streamable[InputType]) Pipe(fn func(InputType) InputType) *streamable[any] {
+// Pipe creates a new streamable by applying fn to each item
+func (s *streamable[InputType]) Pipe(fn func(InputType) any) *streamable[any] {
 	out := make(chan any)
 	go func() {
 		defer close(out)

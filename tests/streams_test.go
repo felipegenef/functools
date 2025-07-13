@@ -39,7 +39,7 @@ func TestStreamPipe(t *testing.T) {
 	stream := functools.Streamify(items)
 
 	// Apply Pipe to double each item
-	transformed := stream.Pipe(func(x int) int { return x * 2 })
+	transformed := stream.Pipe(func(x int) any { return x * 2 })
 
 	// Collect the transformed stream into a slice (which will be of type []any)
 	result := transformed.ToSlice()
